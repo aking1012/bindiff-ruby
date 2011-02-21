@@ -124,17 +124,16 @@ eliminated = 0
 #we only need to do this in one direction
 (1..@fc[0]).each {|func|
   oldasm = @oldfile.getfuncasm(func)
+ #make sure we already determined a matching startadd
  if (!(@funcsaddmatchold[func].nil?))
-  if (!(@funcsaddmatchold[@funcsaddmatchold[func]].nil?))   
-   newasm = @newfile.getfuncasm(func)
+   indexofnew = @funcsaddmatchold[func]
+   newasm = @newfile.getfuncasm(indexofnew)
    if newasm.eql?(oldasm)
     #puts "We got a match...one function eliminated"
-    @neweliminated[func] = @funcsaddmatchold[func]
-#got a bug here...nil error or conversion...still working on this DEBUG
-###    @oldeliminated[@funcsaddmatchnew.index(@funcsaddmatchold[func])]=func
+    @neweliminated[indexofnew] = func
+    @oldeliminated[func] = indexofnew
     eliminated += 1
     end
-   end
   end
   } 
 
@@ -223,6 +222,7 @@ eliminatedtp = 0
 #p @oldeliminated
 
 puts eliminated.to_s + " functions eliminated.\n  Here comes our list of eliminated functions.  0 doesn't count.\n"
+p @oldeliminated
 p @neweliminated
 puts "End of ruby for hackers ep1 pt1 section 2"
 sleep 30
