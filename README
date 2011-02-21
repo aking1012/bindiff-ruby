@@ -1,0 +1,6 @@
+This code is NOWHERE near complete and shouldn't be considered functional.
+It's only here for users following along with the ruby4hackers segment on
+securitytube.  Thanks for reading...
+
+This code is currently being used on REE 1.8.7, but works on 1.9.2 if you
+correct the ./ include problem.
