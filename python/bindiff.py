@@ -23,7 +23,8 @@ def usage(imm):
 
 def main(args):
     imm = Debugger()
-    include_pattern = exclude_pattern = None
+    host = "172.30.1.1"
+    port = 8888
     try:
         opts, args = getopt.getopt(args, "i:")
     except getopt.GetoptError:
@@ -44,7 +45,7 @@ def main(args):
     try:
         bindiffsock.connect(("172.30.1.1", 8888))
     except socket.error, msg:
-        imm.log("Failed to connect to host 172.30.1.1 on port 8888.  Check your addressing or modify me")
+        imm.log("Failed to connect to host %s on port %s." % (host, port))
     module = imm.getModule( image_name )
     modadd = module.getBase()
     func_list = imm.getAllFunctions( modadd )
@@ -54,6 +55,7 @@ def main(args):
         i=1+i
         function=imm.getFunction(f)
         sof = imm.getFunctionBegin(f)
+        eof = imm.getFunctionEnd(f)
         bindiffsock.send("sof:%x!" % (sof))
         imm.log("Start of function: %x" % (sof))
         basicblocks = function.getBasicBlocks(f)
@@ -66,7 +68,7 @@ def main(args):
                 bindiffsock.send("%s!" % inst.result)
             bindiffsock.send("BBE:%x!" % (bb.end))
             imm.log("   BBE:%x" % (bb.end))
-        bindiffsock.send("eof: subtract size??whaaa?!")
+        bindiffsock.send("eof:This is a list of all BB exits...I fail")
     totaltime=imm.markEnd()
     bindiffsock.send("Duration: %d seconds...dumped.  Now for analysis. Will I be as fast as IDA dis + Turbodiff?!" % totaltime)
     bindiffsock.send("exit!")
