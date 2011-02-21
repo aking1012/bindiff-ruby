@@ -3,7 +3,8 @@
 #Creative commons, attribution, share and share alike
 #Our first attempt at a custom binary differ
 #####################################################
-require './bindump.rb'
+$:.unshift File.join(File.dirname(__FILE__),'..')
+require 'bindump.rb'
 @bdstatold = Array.new
 @bdstatnew = Array.new
 @alloldsof = Array.new
