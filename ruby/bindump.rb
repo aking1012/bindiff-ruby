@@ -103,6 +103,127 @@ def getbbasm(func, bb)
  return asm
 end
 
+def getbblen(func, bb)
+ asm = getbbasm(func, bb)
+ return asm.length
+end
+
+def getfuncasmnojsoff(func)
+full = Array.new
+bbct = bbcount(func)
+ (1..bbct).each { |bb|
+ 
+ full.push(getbbasmnojsoff(func, bb))
+ }
+ return full
+end
+
+def getbbasmnojson(func, bb)
+ asm = getbbasm(func, bb)
+ i = 0
+ maxi = asm.length - 1
+ (i..maxi).each{ |inst|
+  #check to see if this is a jump, then check to see if it's a jump to a symbol
+  if (asm[i].index("J")==0 && asm[i].rindex('>')!=(asm[i].length-1))
+   #if it isn't, strip it
+   asm[i]=nil
+  end
+ i += 1
+ }
+# p asm
+# sleep 2
+ i = 0
+ temparr = Array.new
+ (i..maxi).each { |inst|
+  if (!(asm[i].nil?))
+    temparr.push(asm[i])
+  end
+   i += 1
+   }
+  asm = temparr
+ return asm
+end
+
+def getbbasmnojspart(func, bb) #still working on this one
+ asm = getbbasm(func, bb)
+ i = 0
+ maxi = asm.length - 1
+ (i..maxi).each{ |inst|
+  #check to see if this is a jump, then check to see if it's a jump to a symbol
+  #this = asm[i]
+  if (asm[i].index("J")==0 && !(asm[i].index('<').nil?) && asm[i].rindex('<')>5)
+   #if it isn't, strip it
+   #asm[i]=nil
+   instruct = String.new
+   instruct = asm[i]
+   len = instruct.length - 1
+   astart = instruct.index('<')
+   aend = instruct.index('>')
+#the bug here is sustrings returning the numeric representation of a char
+#  FIXME
+   anotherstring = String.new
+   (0..len).each{ |i|
+   if ((i>=astart) && (i<=aend))
+   tempstring = String.new
+   tempstring = instruct[i]
+   p anotherstring
+   p tempstring
+   anotherstring = anotherstring + tempstring
+   end
+   asm[i] = anotherstring.to_s
+   }
+  end
+ i += 1
+ }
+# p asm
+# sleep 2
+ i = 0
+ temparr = Array.new
+ (i..maxi).each { |inst|
+  if (!(asm[i].nil?))
+    temparr.push(asm[i])
+  end
+   i += 1
+   }
+  asm = temparr
+ return asm
+end
+
+def getbbasmnojsoff(func, bb)
+ asm = getbbasm(func, bb)
+ i = 0
+ maxi = asm.length - 1
+ (i..maxi).each{ |inst|
+  #check to see if this is a jump, then check to see if it's a jump to a symbol
+  #puts inst
+  #p asm
+  #p inst
+  test = String.new
+  test = asm[inst]
+  if ( (!(test.nil?)) && (test.index("J")==0 || test.index("CALL")==0))
+#bug here....nilclass what? - just reload the file
+#(!(asm[inst].index("J").nil?)) && asm[inst].index("J")==0)
+   #if it isn't, strip it
+   asm[inst]=nil
+  #puts inst
+  end
+#  i += 1
+# MAYBE??
+ }
+# p asm
+# sleep 2
+ i = 0
+ temparr = Array.new
+ (i..maxi).each { |inst|
+  if (!(asm[i].nil?))
+    temparr.push(asm[inst])
+  end
+   i += 1
+   }
+  asm = temparr
+ return asm
+end
+
 def funccount
  return ((@organized.length)/3)
 end
@@ -157,7 +278,7 @@ end
 
 begin
 if __FILE__ == $0
-test = Bindump.new('immdump.old')
+test = Bindump.new('immdump.new')
 #puts "The assembled array looks like this"
 #p test.getorganized
 #puts "Number of functions is: " + test.funccount.to_s
@@ -180,7 +301,14 @@ test = Bindump.new('immdump.old')
 #test.getbbasm(10,1)
 #p test.getbbasm(10,2)
 #p test.getbbasm(10,3)
-#test.getbbasm(1,2)
+#p test.getbbasmnojson(1,1)
+#test = Bindump.new('immdump.old')
+#p test.getbbasmnojsoff(1,1)
+
+p test.getfuncasmnojsoff(1)
+p test.getfuncasmnojsoff(2)
+p test.getfuncasmnojsoff(3)
+
 #test.getbbasm(1,3)
 end
 end

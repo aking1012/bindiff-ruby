@@ -12,6 +12,22 @@ require 'bindump.rb'
 @alloldeof = Array.new
 @allneweof = Array.new
 
+def getinteresting
+intold = Array.new
+(1..@fc[0]).each {|func|
+ if (@oldeliminated[func].nil?)
+  intold.push(func)
+  end
+  } 
+intnew = Array.new
+(1..@fc[1]).each {|func|
+ if (@neweliminated[func].nil?)
+  intnew.push(func)
+  end
+  }
+return intold, intnew
+end
+
 def func_count
 fcold = @oldfile.funccount
 fcnew = @newfile.funccount
@@ -145,7 +161,6 @@ puts eliminated.to_s + " functions with the same starting address eliminated, fi
 eliminatedtp = 0
 
 #an optimization to only do it from the smaller end
-#<= is failing and it shouldn't bug...
 if (@fc[2]<0)
  (1..@fc[0]).each {|func|
  if (@oldeliminated[func].nil?)
@@ -222,12 +237,61 @@ eliminatedtp = 0
 #p @oldeliminated
 
 puts eliminated.to_s + " functions eliminated.\n  Here comes our list of eliminated functions.  0 doesn't count.\n"
-p @oldeliminated
-p @neweliminated
 puts "End of ruby for hackers ep1 pt1 section 2"
-sleep 30
+#sleep 30
 
-#fourth pass, now we have to examine basic blocks
+#fourth pass, strip all jumps and calls to account for memory changes
+eliminatedtp = 0
+if (@fc[2]>=0)
+(1..@fc[0]).each {|func|
+  if (@oldeliminated[func].nil?)
+   (1..@fc[1]).each {|funca|
+   if (@neweliminated[funca].nil?)
+   oldasm = @oldfile.getfuncasmnojsoff(func)
+   newasm = @newfile.getfuncasmnojsoff(funca)
+    if newasm.eql?(oldasm)
+    #puts "We got a match...one function eliminated"
+    @neweliminated[funca] = func
+    @oldeliminated[func] = funca
+    eliminatedtp += 1
+    end
+   end
+   }
+  end
+  }
+else
+(1..@fc[1]).each {|func|
+  if (@oldeliminated[func].nil?)
+   (1..@fc[0]).each {|funca|
+   if (@neweliminated[funca].nil?)
+   oldasm = @oldfile.getfuncasmnojsoff(funca)
+   newasm = @newfile.getfuncasmnojsoff(func)
+    if newasm.eql?(oldasm)
+    #puts "We got a match...one function eliminated"
+    @neweliminated[funca] = funca
+    @oldeliminated[func] = func
+    eliminatedtp += 1
+    end
+   end
+   }
+  end
+  }
+end#here
+puts eliminatedtp.to_s + " functions with eliminated different starting index and jump call stripping, fourth pass complete."
+eliminated += eliminatedtp
+eliminatedtp = 0
+puts eliminated.to_s + " of " + (@fc[0]).to_s  + " total functions eliminated"
+intold = Array.new
+intnew = Array.new
+intold, intnew = getinteresting
+puts "Interesting old functions"
+ p intold
+puts "Interesting new fucntions"
+ p intnew
+#note this does not account for changing calls to safer functions...
+#we'll do that later
+#p @oldeliminated
+#p @neweliminated
 
 
 end

@@ -2,5 +2,7 @@ This code is NOWHERE near complete and shouldn't be considered functional.
 It's only here for users following along with the ruby4hackers segment on
 securitytube.  Thanks for reading...
 
-This code is currently being used on REE 1.8.7, but works on 1.9.2 if you
-correct the ./ include problem.
+This code is currently being used on REE 1.8.7, but works on 1.9.2.
+I already corrected the problem with local file includes.
+
+<a href='http://www.pledgie.com/campaigns/14689'><img alt='Click here to lend your support to: Security Video Donations and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/14689.png?skin_name=chrome' border='0' /></a>
