@@ -108,12 +108,12 @@ def getbblen(func, bb)
  return asm.length
 end
 
-def getfuncasmnojsoff(func)
+def getfuncasmnojsoff(func, dllname)
 full = Array.new
 bbct = bbcount(func)
  (1..bbct).each { |bb|
  
- full.push(getbbasmnojsoff(func, bb))
+ full.push(getbbasmnojsoff(func, bb, dllname))
  }
  return full
 end
@@ -144,7 +144,7 @@ def getbbasmnojson(func, bb)
  return asm
 end
 
-def getbbasmnojspart(func, bb) #still working on this one
+def getbbasmnojspart(func, bb, dllname) #still working on this one
  asm = getbbasm(func, bb)
  i = 0
  maxi = asm.length - 1
@@ -189,8 +189,12 @@ def getbbasmnojspart(func, bb) #still working on this one
  return asm
 end
 
-def getbbasmnojsoff(func, bb)
+def getbbasmnojsoff(func, bb, dllname)
  asm = getbbasm(func, bb)
+ if (asm.nil?)
+  asm = Array.new
+  asm.push("emptyafterstripping")
+ end
  i = 0
  maxi = asm.length - 1
  (i..maxi).each{ |inst|
@@ -200,13 +204,27 @@ def getbbasmnojsoff(func, bb)
   #p inst
   test = String.new
   test = asm[inst]
-  if ( (!(test.nil?)) && (test.index("J")==0 || test.index("CALL")==0))
+#  test.push(asm[inst])
+  test = test.to_s
+#  p test
+  if (!(test.nil?))
+#  puts "test not nil"
+  if (!(test.index("J").nil?) || (!(test.index("CALL").nil?)))
+# || (!(test.index(dllname).nil?)))
+#  puts "index of one is not nil"
+  if (test.index("J")==0 || test.index("CALL")==0 || !(test.index(dllname).nil?))
+#  puts "index of one is 0"
 #bug here....nilclass what? - just reload the file
 #(!(asm[inst].index("J").nil?)) && asm[inst].index("J")==0)
    #if it isn't, strip it
    asm[inst]=nil
   #puts inst
   end
+  end
+  end
+#  p asm[inst]
+#  sleep 1
+
 #  i += 1
 # MAYBE??
  }
@@ -278,7 +296,9 @@ end
 
 begin
 if __FILE__ == $0
-test = Bindump.new('immdump.new')
+test = Bindump.new('immdump.old')
+testa = Bindump.new('immdump.old')
+dllname = ARGV[0]
 #puts "The assembled array looks like this"
 #p test.getorganized
 #puts "Number of functions is: " + test.funccount.to_s
@@ -305,10 +325,70 @@ test = Bindump.new('immdump.new')
 #test = Bindump.new('immdump.old')
 #p test.getbbasmnojsoff(1,1)
 
-p test.getfuncasmnojsoff(1)
-p test.getfuncasmnojsoff(2)
-p test.getfuncasmnojsoff(3)
+atest = test.getfuncasmnojsoff(4, dllname)
+btest = testa.getfuncasmnojsoff(4, dllname)
 
-#test.getbbasm(1,3)
+p atest.length
+p btest.length
+
+a = File.new("./diff.old", 'w+')
+b = File.new("./diff.new", 'w+')
+
+a.write(atest)
+b.write(btest)
+
+a.flush
+b.flush
+a.close
+b.close
+atest = test.getfuncasmnojsoff(5, dllname)
+btest = testa.getfuncasmnojsoff(5, dllname)
+
+p atest.length
+p btest.length
+
+a = File.new("./diff.old1", 'w+')
+b = File.new("./diff.new1", 'w+')
+
+a.write(atest)
+b.write(btest)
+
+a.flush
+b.flush
+a.close
+b.close
+atest = test.getfuncasmnojsoff(168, dllname)
+btest = testa.getfuncasmnojsoff(168, dllname)
+
+p atest.length
+p btest.length
+
+a = File.new("./diff.old2", 'w+')
+b = File.new("./diff.new2", 'w+')
+
+a.write(atest)
+b.write(btest)
+
+a.flush
+b.flush
+a.close
+b.close
+atest = test.getfuncasmnojsoff(114, dllname)
+btest = testa.getfuncasmnojsoff(114, dllname)
+
+p atest.length
+p btest.length
+
+a = File.new("./diff.old3", 'w+')
+b = File.new("./diff.new3", 'w+')
+
+a.write(atest)
+b.write(btest)
+
+a.flush
+b.flush
+a.close
+b.close
+
 end
 end
